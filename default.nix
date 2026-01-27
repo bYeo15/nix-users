@@ -1,5 +1,5 @@
 {
-    ben = import ./ben;
+    ben = [ (import ./ben) ];
 
     userModules = import ./nixos;
 }

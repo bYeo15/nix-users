@@ -3,5 +3,5 @@
     node = import ./node.nix;
     staging = import ./staging.nix;
 
-    namedMainUser = import ./genNamedUser.nix;
+    namedMainUser = import ./genMainUser.nix;
 }
