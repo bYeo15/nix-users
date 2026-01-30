@@ -1,5 +1,8 @@
 { config, lib, pkgs, ... }:
 
 {
-    config.renix.activeTheme = config.renix.themes."singularity";
+    config.renix = {
+        enable = true;
+        activeTheme = config.renix.themes."singularity";
+    };
 }

@@ -24,7 +24,7 @@
     programs.bash = with config.renix.activeTheme; {
         enable = true;
         bashrcExtra = ''
-            export PS1="\\n\\[\\033[1;38;5;${termColour.clText}m\\][\\[\\e]0;\\u@\\h: \\w\\a\\]\\u@\\h:\\w]\\$ \\[\\033[0m\\]";
+            export PS1="\\n\\[\\033[1;38;5;${termColour.mainFg}m\\][\\[\\e]0;\\u@\\h: \\w\\a\\]\\u@\\h:\\w]\\$ \\[\\033[0m\\]";
             osc7_cwd() {
                 local strlen=''${#PWD}
                 local encoded=""
