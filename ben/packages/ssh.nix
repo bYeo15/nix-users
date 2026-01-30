@@ -3,6 +3,6 @@
 {
     programs.ssh = {
         enable = true;
-        matchBlocks = extlib.filterTagged "block" [ "all" "git" "homelab" ] config.sshConn.connections;
+        matchBlocks = extlib.filterTagged "block" [ "all" "git" "homelab" ] config.sshConn;
     };
 }
