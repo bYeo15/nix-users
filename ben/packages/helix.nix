@@ -6,7 +6,6 @@
         defaultEditor = true;
 
         settings = {
-            theme = "active";
             editor = {
                 default-yank-register = "+";
                 shell = [ "bash" "-c" ];
