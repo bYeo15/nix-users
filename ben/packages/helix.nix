@@ -123,6 +123,7 @@
                         X = [ "hsplit" "file_explorer_in_current_directory" ];
                         c = "wclose";
                         C = ":buffer-close";
+                        r = [ ":buffer-close" "file_explorer_in_current_directory" ];
                         space = "file_explorer_in_current_directory";
                     };
                 };
