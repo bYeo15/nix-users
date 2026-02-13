@@ -1,4 +1,4 @@
-{ config, lib, pkgs, externalPackages, ... }:
+{ config, lib, pkgs, extpkgs, ... }:
 
 {
     programs.firefox = {
@@ -221,7 +221,7 @@
                 };
                 extensions = {
                     force = true;
-                    packages = with externalPackages.nur.repos.rycee.firefox-addons; [
+                    packages = with extpkgs.nur.repos.rycee.firefox-addons; [
                         ublock-origin
                     ];
                 };

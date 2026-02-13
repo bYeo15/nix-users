@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, extpkgs, ... }:
 
 {
     nixpkgs.config.allowUnfree = true;
@@ -38,7 +38,8 @@
         cliphist
         grim
         slurp
-        glpaper
+
+        extpkgs.glbg
     ];
 
     # --[ Programs ]--
