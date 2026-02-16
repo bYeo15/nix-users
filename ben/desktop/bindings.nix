@@ -4,7 +4,7 @@ let
     # ---=[ Commands ]=---
     term = "${pkgs.foot}/bin/foot";
     cap = "'grim -g \"''$(slurp -d)\" - | wl-copy -t image/png'";
-    copy-history = "cliphist list | rofi -dmenu -font \"${config.renix.activeTheme.fontMono} ${toString config.renix.activeTheme.fontSizeNormal}\" -p \"Select Clipboard Item\" | cliphist decode | wl-copy";
+    copy-history = "cliphist list | rofi -dmenu -font \"${config.renix.activeTheme.fontMono} ${toString config.renix.activeTheme.fontSizeNormal}\" -p \"Select Clipboard Item\" -no-tokenize | cliphist decode | wl-copy";
     copy-clear = "cliphist wipe";
     # ---=[ Workspaces ]=---
     ws1 = "1";

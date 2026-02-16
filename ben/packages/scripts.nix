@@ -1,3 +1,5 @@
+# TODO : port this to a common home module (infer programs)
+
 { config, lib, pkgs, ... }:
 
 let
@@ -8,10 +10,11 @@ let
 
         REGEX_SITE="[^\s]+\.[^\s]+"
 
-        SEARCH=''$(echo | rofi -dmenu -p "Search Term: " -theme-str 'window{height:32;}')
+        SEARCH=''$(echo | rofi -dmenu -p "Search Term:" -theme-str 'window{height:32;}')
 
         if [[ -z ''$SEARCH ]]; then exit 1; fi
 
+        # TODO : Stricter pattern?
         swaymsg -q [title='.*Private.*'] focus
 
         if [[ ''$SEARCH =~ ''$REGEX_SITE ]]; then
@@ -91,9 +94,23 @@ let
             fi
         fi
     '';
+
+    hsearch = pkgs.writeShellScriptBin "hsearch" ''
+        # TODO : Infer from config
+        HISTORY_FILE="~/.bash_history"
+
+        HIST="''$(cat "''$HISTORY_FILE")"
+
+        if [[ ''$# -ge 1 ]]; then
+            HIST="''$(grep ''$@ <<< "''$HIST")"
+        fi
+
+        rofi -dmenu -no-tokenize -p "Select History Entry:" <<< "''$HIST" | wl-copy
+    '';
 in {
     home.packages = [
         rofi-quicksearch
+        hsearch
         devshell-manager
         volume-wrapper
     ];
