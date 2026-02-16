@@ -97,7 +97,7 @@ let
 
     hsearch = pkgs.writeShellScriptBin "hsearch" ''
         # TODO : Infer from config
-        HISTORY_FILE="~/.bash_history"
+        HISTORY_FILE="''$HOME/.bash_history"
 
         HIST="''$(cat "''$HISTORY_FILE")"
 
