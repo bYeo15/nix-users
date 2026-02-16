@@ -8,6 +8,7 @@ username: { config, pkgs, lib, ... }:
             "wheel"
             "audio"
             "video"
+            "realtime"
             "light"
             "networkmanager"
             "powermanagement"
