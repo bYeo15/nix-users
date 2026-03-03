@@ -1,4 +1,4 @@
-username: { config, lib, pkgs, ... }:
+groups: username: { config, lib, pkgs, ... }:
 
 {
     users.users."${username}" = {
@@ -9,5 +9,7 @@ username: { config, lib, pkgs, ... }:
         ];
 
         shell = pkgs.bash;
+
+        extraGroups = groups;
     };
 }
