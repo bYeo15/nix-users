@@ -83,8 +83,8 @@ in {
             "${modifier}+comma" = "exec playerctl previous";
 
             # ---=[ Misc ]=---
-            "--locked XF86MonBrightnessDown" = "exec light -U 5";
-            "--locked XF86MonBrightnessUp" = "exec light -A 5";
+            "--locked XF86MonBrightnessDown" = "exec brightnessctl s +5%";
+            "--locked XF86MonBrightnessUp" = "exec brightnessctl s 5%-";
 
             "Print" = "exec ${cap}";
             "${modifier}+Shift+v" = "exec ${copy-history}";
