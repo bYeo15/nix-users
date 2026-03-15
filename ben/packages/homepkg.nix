@@ -60,5 +60,6 @@
     services = {
         mpris-proxy.enable = true;
         mako.enable = true;
+        playerctld.enable = true;
     };
 }
