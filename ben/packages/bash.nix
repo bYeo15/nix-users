@@ -2,15 +2,20 @@
 
 {
     home.shellAliases = {
+        # Short binds
         c = "clear; echo \"\${PS1@P}\"; ls";
         u = "cd ..";
         uu = "cd ../..";
-        l = "ls -alh";
+        uuu = "cd ../../..";
+        uuuu = "cd ../../../..";
+        q = "exit";
+        # Default args
+        bc = "bc -ql";
         ls = "ls --color=auto";
+        l = "ls -alh";
         grep = "grep --color=auto";
         glow = "glow -n";
         zpdf = "zathura --fork";
-        foot-detach = "foot & disown";
         icat = "img2sixel";
         nsh = "nix-shell -p";
     };
@@ -41,11 +46,22 @@
             }
             PROMPT_COMMAND=''${PROMPT_COMMAND:+''${PROMPT_COMMAND%;}; }osc7_cwd
             nrun() { PROG="''$1"; shift; nix run nixpkgs#"''${PROG}" -- "''$@"; }
+            t() {
+                if [[ -z "''$1" ]]; then
+                    DIR="''$PWD"
+                else
+                    DIR="''$1"
+                fi
+
+                (foot --working-directory="''$DIR" --log-level=none & disown -h)
+            }
         '';
 
         historyIgnore = [
             "ls" "l"
-            "cd" "u" "uu"
+            "rm" "touch"
+            "cd" "u" "uu" "uuu"
+            "t"
             "exit"
             "clear" "c"
         ];
