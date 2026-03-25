@@ -5,17 +5,14 @@
 let
     rofi-quicksearch = pkgs.writeShellScriptBin "rofi-quicksearch" ''
         BROWSER=firefox
-        ARGS=--private-window
+        ARGS="--private-window --new-window"
         ENGINE="https://noai.duckduckgo.com/?q="
 
-        REGEX_SITE="[^\s]+\.[^\s]+"
+        REGEX_SITE="[^\ ]+\.[^\ ]+"
 
         SEARCH=''$(echo | rofi -dmenu -p "Search Term:" -theme-str 'window{height:32;}')
 
         if [[ -z ''$SEARCH ]]; then exit 1; fi
-
-        # TODO : Stricter pattern?
-        swaymsg -q [title='.*Private.*'] focus
 
         if [[ ''$SEARCH =~ ''$REGEX_SITE ]]; then
             exec ''${BROWSER} ''${ARGS} "''${SEARCH}"
