@@ -58,7 +58,7 @@
                             urls = [{
                                 template = "https://search.nixos.org/packages";
                                 params = [
-                                    { name = "type"; value = "packages"; }
+                                    { name = "channel"; value = "unstable"; }
                                     { name = "query"; value = "{searchTerms}"; }
                                 ];
                             }];
@@ -68,7 +68,7 @@
                             urls = [{
                                 template = "https://search.nixos.org/options";
                                 params = [
-                                    { name = "type"; value = "options"; }
+                                    { name = "channel"; value = "unstable"; }
                                     { name = "query"; value = "{searchTerms}"; }
                                 ];
                             }];
@@ -84,7 +84,7 @@
                         };
                         "HomeManagerOpts" = {
                             name = "HomeManager";
-                            urls = [{ template = "https://home-manager-options.extranix.com/?query={searchTerms}"; }];
+                            urls = [{ template = "https://home-manager-options.extranix.com/?query={searchTerms}&release=master"; }];
                             definedAliases = [ "@hm" ];
                         };
                         "Subreddit" = {
