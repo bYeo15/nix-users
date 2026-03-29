@@ -27,7 +27,7 @@ in {
             # ---=[ Applications and Launcher ]=---
             "${modifier}+Return" = "exec ${terminal}";
             "${modifier}+d" = "exec ${menu} -show drun";
-            "${modifier}+s" = "exec rofi-quicksearch";
+            "${modifier}+s" = "exec quicksearch";
             "${modifier}+Tab" = "exec ${menu} -show window";
 
             # ---=[ Navigation ]=---
