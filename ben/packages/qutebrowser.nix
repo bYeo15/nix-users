@@ -54,7 +54,7 @@ in {
                 };
             };
 
-            editor.command = "hx {file}:{line}:{column}";
+            editor.command = [ "hx" "{file}:{line}:{column}" ];
         };
 
         perDomainSettings = {
