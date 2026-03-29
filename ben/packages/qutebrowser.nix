@@ -21,7 +21,6 @@ in {
         enable = true;
 
         settings = {
-            # TODO : Complete settings
             content = {
                 autoplay = false;
 
@@ -34,9 +33,10 @@ in {
                 geolocation = false;
 
                 javascript = {
-                    enabled = false;
+                    enabled = true;
                     can_close_tabs = false;
                     can_open_tabs_automatically = false;
+                    clipboard = "none";
                 };
 
                 pdfjs = true;
@@ -68,29 +68,15 @@ in {
 
         perDomainSettings = {
             "bandcamp.com" = {
-                content.javascript.enabled = true;
                 content.cookies = {
                     accept = "no-3rdparty";
                 };
             };
 
             "*.bandcamp.com" = {
-                content.javascript.enabled = true;
                 content.cookies = {
                     accept = "no-3rdparty";
                 };
-            };
-
-            "home-manager-options.extranix.com" = {
-                content.javascript.enabled = true;
-            };
-
-            "noogle.dev" = {
-                content.javascript.enabled = true;
-            };
-
-            "search.nixos.org" = {
-                content.javascript.enabled = true;
             };
         };
 
@@ -113,17 +99,20 @@ in {
                 "f" = "hint";
                 "F" = "hint all tab-fg";
 
+                "b" = "hint all hover";
+                "B" = "hint all yank";
+
                 "d" = "tab-close";
                 "D" = "undo";
 
-                "s" = "open --window";
+                "s" = "cmd-set-text --space :open --window";
                 "S" = "tab-give --keep";
 
                 "a" = "set-mark A";
                 "A" = "jump-mark A";
 
-                "t" = "open --tab";
-                "T" = "cmd-set-text :open --tab ";
+                "t" = "cmd-set-text --space :open --tab";
+                "T" = "cmd-set-text --space :open --bg";
 
                 "1" = "tab-focus 1";
                 "2" = "tab-focus 2";
