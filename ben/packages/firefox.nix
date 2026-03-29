@@ -14,10 +14,12 @@ let
                 name = n;
             } // v)]
         ) [] group;
+        # Ordering: groups before standalone bookmarks, then alphabetical
+        sortBookmarks = lib.sort (a: b: (! a ? bookmarks && b ? bookmarks) || (a.name < b.name))
     in {
         name = "Toolbar";
         toolbar = true;
-        bookmarks = (foldGroup (if groupedBookmarks ? "__ungrouped" then groupedBookmarks.__ungrouped else { }))
+        bookmarks = sortBookmarks (foldGroup (if groupedBookmarks ? "__ungrouped" then groupedBookmarks.__ungrouped else { }))
         ++ lib.mapAttrsToList (n: v: {
             name = n;
             bookmarks = foldGroup v;
