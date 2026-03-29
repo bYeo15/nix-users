@@ -1,6 +1,37 @@
 { config, lib, pkgs, extpkgs, ... }:
 
-{
+let
+    makeBookmarks = bookmarks: let
+        groupedBookmarks = lib.foldlAttrs (acc: n: v:
+            lib.attrsets.recursiveUpdate acc (
+                lib.setAttrByPath
+                    (if ! isNull v.group then [ v.group n ] else [ "__ungrouped" n ])
+                    { inherit (v) url keyword tags; }
+            )
+        ) {} bookmarks;
+        foldGroup = group: lib.foldlAttrs (acc: n: v:
+            acc ++ [({
+                name = n;
+            } // v)]
+        ) [] group;
+    in {
+        name = "Toolbar";
+        toolbar = true;
+        bookmarks = (foldGroup (if groupedBookmarks ? "__ungrouped" then groupedBookmarks.__ungrouped else { }))
+        ++ lib.mapAttrsToList (n: v: {
+            name = n;
+            bookmarks = foldGroup v;
+        }) (lib.removeAttrs groupedBookmarks [ "__ungrouped" ]);
+    };
+
+    makeEngines = engines: lib.mapAttrs (
+        name: engine: {
+            urls = [{ template = engine.template "{searchTerms}"; }];
+            definedAliases = [ "@${engine.symbol}" ];
+        }
+    ) engines;
+
+in {
     programs.firefox = {
         enable = true;
         policies = {
@@ -39,6 +70,17 @@
                     # -- No AI --
                     "browser.ml.enable" = false;
                     "browser.ml.chat.enabled" = false;
+                    "browser.ml.linkPreview.enabled" = false;
+                    "browser.ml.pageAssist.enabled" = false;
+                    "browser.ml.smartAssist.enabled" = false;
+
+                    "extensions.ml.enabled" = false;
+
+                    "browser.ai.control.default" = "blocked";
+                    "browser.ai.control.linkPreviewKeyPoints" = "blocked";
+                    "browser.ai.control.pdfjsAltText" = "blocked";
+                    "browser.ai.control.sidebarChatbot" = "blocked";
+
 
                     "extensions.pocket.enabled" = false;
                 };
@@ -46,177 +88,18 @@
                     force = true;
                     default = "ddg";
                     privateDefault = "ddg";
-                    # ===[ Custom Searches ]===
                     engines = {
-                        "DuckDuckGo" = {
-                            urls = [{
-                                template = "https://noai.duckduckgo.com/?q={searchTerms}";
-                            }];
-                            definedAliases = [ "@ddg" ];
-                        };
-                        "Nixpkgs" = {
-                            urls = [{
-                                template = "https://search.nixos.org/packages";
-                                params = [
-                                    { name = "channel"; value = "unstable"; }
-                                    { name = "query"; value = "{searchTerms}"; }
-                                ];
-                            }];
-                            definedAliases = [ "@np" ];
-                        };
-                        "Nixopts" = {
-                            urls = [{
-                                template = "https://search.nixos.org/options";
-                                params = [
-                                    { name = "channel"; value = "unstable"; }
-                                    { name = "query"; value = "{searchTerms}"; }
-                                ];
-                            }];
-                            definedAliases = [ "@no" ];
-                        };
-                        "NixWiki" = {
-                            urls = [{ template = "https://wiki.nixos.org/w/index.php?search={searchTerms}"; }];
-                            definedAliases = [ "@nw" ];
-                        };
-                        "Noogle" = {
-                            urls = [{ template = "https://noogle.dev/q?term={searchTerms}"; }];
-                            definedAliases = [ "@ng" ];
-                        };
-                        "HomeManagerOpts" = {
-                            name = "HomeManager";
-                            urls = [{ template = "https://home-manager-options.extranix.com/?query={searchTerms}&release=master"; }];
-                            definedAliases = [ "@hm" ];
-                        };
-                        "Subreddit" = {
-                            urls = [{ template = "https://reddit.com/r/{searchTerms}/hot"; }];
-                            definedAliases = [ "@rd" ];
-                        };
-
-                        # -- Disable Unwanted Engines --
+                        # Disable unwanted search engines
                         "google".metaData.hidden = true;
                         "perplexity".metaData.hidden = true;
                         "bing".metaData.hidden = true;
                         "ebay".metaData.hidden = true;
-                    };
+                    } // makeEngines config.browserData.searchEngines;
                 };
                 bookmarks = {
                     force = true;
                     settings = [
-                        # ---=[ Bookmark Toolbar ]=---
-                        {
-                            name = "Toolbar";
-                            toolbar = true;
-                            bookmarks = [
-                                # ===[ Google Bookmarks ]===
-                                {
-                                    name = "Google";
-                                    bookmarks = [
-                                        {
-                                            name = "Gmail";
-                                            tags = [ "mail" ];
-                                            keyword = "gmail";
-                                            url = "https://mail.google.com/";
-                                        }
-                                        {
-                                            name = "Drive";
-                                            tags = [ "files" ];
-                                            keyword = "gdrive";
-                                            url = "https://drive.google.com/drive/my-drive";
-                                        }
-                                    ];
-                                }
-                                # ===[ USYD Bookmarks ]===
-                                {
-                                    name = "USYD";
-                                    bookmarks = [
-                                        {
-                                            name = "USYD Portal";
-                                            tags = [ "usyd" ];
-                                            url = "https://sydneystudent.sydney.edu.au/";
-                                        }
-                                        {
-                                            name = "Canvas";
-                                            tags = [ "usyd" ];
-                                            keyword = "canvas";
-                                            url = "https://canvas.sydney.edu.au/";
-                                        }
-                                        {
-                                            name = "EdStem";
-                                            tags = [ "usyd" ];
-                                            keyword = "edstem";
-                                            url = "https://edstem.org/au/dashboard";
-                                        }
-                                        {
-                                            name = "USYD Timetable";
-                                            tags = [ "usyd" ];
-                                            url = "https://timetable.sydney.edu.au/even/student";
-                                        }
-                                        {
-                                            name = "USYD GitHub";
-                                            tags = [ "usyd" "git" ];
-                                            url = "https://github.sydney.edu.au/";
-                                        }
-                                    ];
-                                }
-                                # ===[ UTS Bookmarks ]===
-                                {
-                                    name = "UTS";
-                                    bookmarks = [
-                                        {
-                                            name = "UTS Apps";
-                                            tags = [ "uts" ];
-                                            keyword = "uts";
-                                            url = "https://login.uts.edu.au/app/UserHome";
-                                        }
-                                    ];
-                                }
-                                # ===[ Misc Bookmarks ]===
-                                {
-                                    name = "Outlook";
-                                    tags = [ "usyd" "uts" "mail" ];
-                                    url = "https://outlook.office.com/mail/";
-                                }
-                                {
-                                    name = "Wolfram";
-                                    tags = [ "util" ];
-                                    keyword = "wolfram";
-                                    url = "https://www.wolframalpha.com/";
-                                }
-                                {
-                                    name = "regex101";
-                                    tags = [ "util" ];
-                                    keyword = "regex";
-                                    url = "https://regex101.com/";
-                                }
-                                {
-                                    name = "Fistful of Vinyl";
-                                    tags = [ "music" ];
-                                    keyword = "vinyl";
-                                    url = "https://spinitron.com/KXLU/show/190219/A-Fistful-of-Vinyl";
-                                }
-                                {
-                                    name = "Bandcamp";
-                                    tags = [ "music" ];
-                                    keyword = "bandcamp";
-                                    url = "https://bandcamp.com/";
-                                }
-                            ];
-                        }
-
-                        # ---=[ Non-Toolbar Bookmarks ]=---
-                        {
-                            name = "Quick Links";
-                            toolbar = false;
-
-                            bookmarks = [
-                                {
-                                    name = "GitHub";
-                                    tags = [ "git" ];
-                                    keyword = "git";
-                                    url = "https://github.com/";
-                                }
-                            ];
-                        }
+                        (makeBookmarks config.browserData.bookmarks)
                     ];
                 };
                 extensions = {
