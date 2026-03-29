@@ -10,13 +10,13 @@
             };
 
             "Nixpkgs" = {
-                template = searchToken: "https://search.nixos.org/packages/?channel=unstable&query=${searchToken}";
+                template = searchToken: "https://search.nixos.org/packages?channel=unstable&query=${searchToken}";
                 symbol = "np";
                 tags = [ "nix" ];
             };
 
             "Nixopts" = {
-                template = searchToken: "https://search.nixos.org/options/?channel=unstable&query=${searchToken}";
+                template = searchToken: "https://search.nixos.org/options?channel=unstable&query=${searchToken}";
                 symbol = "no";
                 tags = [ "nix" ];
             };
