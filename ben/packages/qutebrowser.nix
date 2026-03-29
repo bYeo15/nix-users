@@ -55,21 +55,96 @@ in {
             };
 
             editor.command = [ "hx" "{file}:{line}:{column}" ];
+
+            tabs = {
+                last_close = "close";
+            };
+
+            url = {
+                default_page = "about:blank";
+                start_pages = "about:blank";
+            };
         };
 
         perDomainSettings = {
-            # TODO : javescript whitelist
+            "bandcamp.com" = {
+                content.javascript.enabled = true;
+                content.cookies = {
+                    accept = "no-3rdparty";
+                };
+            };
+
+            "*.bandcamp.com" = {
+                content.javascript.enabled = true;
+                content.cookies = {
+                    accept = "no-3rdparty";
+                };
+            };
+
+            "home-manager-options.extranix.com" = {
+                content.javascript.enabled = true;
+            };
+
+            "noogle.dev" = {
+                content.javascript.enabled = true;
+            };
+
+            "search.nixos.org" = {
+                content.javascript.enabled = true;
+            };
         };
 
         searchEngines = makeEngines config.browserData.searchEngines "DuckDuckGo";
 
         keyBindings = {
-            # TODO
+            normal = {
+                "h" = "tab-prev";
+                "l" = "tab-next";
+
+                "H" = "back --quiet";
+                "L" = "forward --quiet";
+
+                "k" = "scroll up";
+                "j" = "scroll down";
+
+                "K" = "search-prev";
+                "J" = "search-next";
+
+                "f" = "hint";
+                "F" = "hint all tab-fg";
+
+                "d" = "tab-close";
+                "D" = "undo";
+
+                "s" = "open --window";
+                "S" = "tab-give --keep";
+
+                "a" = "set-mark A";
+                "A" = "jump-mark A";
+
+                "t" = "open --tab";
+                "T" = "cmd-set-text :open --tab ";
+
+                "1" = "tab-focus 1";
+                "2" = "tab-focus 2";
+                "3" = "tab-focus 3";
+                "4" = "tab-focus 4";
+                "5" = "tab-focus 5";
+                "6" = "tab-focus 6";
+                "7" = "tab-focus 7";
+                "8" = "tab-focus 8";
+                "9" = "tab-focus 9";
+
+                "/" = "cmd-set-text /";
+                ":" = "cmd-set-text :";
+
+                "<Escape>" = "clear-keychain ;; search";
+            };
         };
+        # TODO : Complete personal binds and disable base
         enableDefaultBindings = true;
 
         aliases = {
-            # TODO
         };
 
         quickmarks = makeBookmarks config.browserData.bookmarks;
