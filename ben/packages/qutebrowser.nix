@@ -16,6 +16,17 @@ let
     ) engines) // {
         "DEFAULT" = engines."${default}".template "{}";
     };
+
+    makeBlocklist = contents: pkgs.writeTextFile {
+        name = "qutebrowserBlocklist";
+        text = contents;
+    };
+
+    blocklistURI = blocklist: "file://${blocklist}";
+
+    bandcampNoCookies = makeBlocklist ''
+        bandcamp.com##+js(trusted-set-cookie, cookie_preferences, '{"allow":[]}')
+    '';
 in {
     programs.qutebrowser = {
         enable = true;
@@ -29,16 +40,19 @@ in {
                         "https://easylist.to/easylist/easylist.txt"
                         "https://easylist.to/easylist/easyprivacy.txt"
                         "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt"
+                        (blocklistURI bandcampNoCookies)
                     ];
                 };
 
                 cookies = {
-                    accept = "never";
+                    accept = "no-3rdparty";
                     store = false;
                 };
 
                 desktop_capture = false;
                 geolocation = false;
+
+                headers.user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0";
 
                 javascript = {
                     enabled = true;
@@ -74,24 +88,14 @@ in {
             };
         };
 
-        perDomainSettings = {
-            "bandcamp.com" = {
-                content.cookies = {
-                    accept = "no-3rdparty";
-                };
-            };
-
-            "*.bandcamp.com" = {
-                content.cookies = {
-                    accept = "no-3rdparty";
-                };
-            };
-        };
-
         searchEngines = makeEngines config.browserData.searchEngines "DuckDuckGo";
 
         keyBindings = {
-            normal = {
+            normal = let
+                # Map base key + a set of subkeys to common command
+                makeCommandSet = base: sub: template: lib.genAttrs' sub (k: lib.nameValuePair (base + k) (template k));
+                markSet = [ "h" "j" "k" "l" "s" "d" "f" ];
+            in {
                 "h" = "tab-prev";
                 "l" = "tab-next";
 
@@ -104,6 +108,9 @@ in {
                 "K" = "search-prev";
                 "J" = "search-next";
 
+                "gk" = "scroll-to-perc 0";
+                "gj" = "scroll-to-perc 100";
+
                 "f" = "hint";
                 "F" = "hint all tab-fg";
 
@@ -115,9 +122,6 @@ in {
 
                 "s" = "cmd-set-text --space :open --window";
                 "S" = "tab-give --keep";
-
-                "a" = "set-mark A";
-                "A" = "jump-mark A";
 
                 "t" = "cmd-set-text --space :open --tab";
                 "T" = "cmd-set-text --space :open --bg";
@@ -136,7 +140,9 @@ in {
                 ":" = "cmd-set-text :";
 
                 "<Escape>" = "clear-keychain ;; search";
-            };
+            } // (makeCommandSet "a" markSet (k: "set-mark ${k}"))
+              // (makeCommandSet "A" markSet (k: "jump-mark ${k}"));
+            # a sets a mark, A jumps to a mark
         };
         # TODO : Complete personal binds and disable base
         enableDefaultBindings = true;
