@@ -10,12 +10,12 @@
         fira-code-symbols
         adwaita-fonts
         font-awesome
-        departure-mono
         nerd-fonts.symbols-only
 
-        # ---=[ Misc Fonts ]=---
-        julia-mono
+        # For themes
         gohufont
+        tamzen
+        departure-mono
     ];
 
     fonts.fontconfig = {
