@@ -1,6 +1,10 @@
 { config, lib, pkgs, ... }:
 
-{
+let
+    skipFontDir = font: font.overrideAttrs (finalAttrs: prevAttrs: {
+        installPhase = lib.strings.replaceString "mkfontdir" "true" prevAttrs.installPhase;
+    });
+in {
     home.packages = with pkgs; [
         noto-fonts
         noto-fonts-cjk-sans
@@ -13,8 +17,8 @@
         nerd-fonts.symbols-only
 
         # For themes
-        gohufont
-        tamzen
+        (skipFontDir gohufont)
+        (skipFontDir tamzen)
         departure-mono
     ];
 
