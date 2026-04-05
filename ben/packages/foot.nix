@@ -7,7 +7,7 @@
             main = {
                 font = "${fontMono}:size=${toString fontSizeNormal}";
             };
-            colors = {
+            colors-dark = {
                 foreground = colour.mainFg;
                 background = colour.mainBg;
                 cursor = "${colour.accentFg} ${colour.accentBg}";
