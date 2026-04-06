@@ -3,6 +3,6 @@
 {
     config.renix = {
         enable = true;
-        activeTheme = config.renix.themes."singularity";
+        activeTheme = config.renix.themes."terminal";
     };
 }
