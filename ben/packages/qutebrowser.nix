@@ -77,8 +77,8 @@ in {
             };
 
             url = {
-                default_page = "about:blank";
-                start_pages = "about:blank";
+                default_page = lib.mkDefault "about:blank";
+                start_pages = lib.mkDefault "about:blank";
             };
         };
 
@@ -109,7 +109,7 @@ in {
                 "F" = "hint all tab-fg";
 
                 "b" = "hint all tab-bg";
-                "B" = "hint all hover";
+                "B" = "hint all tab-bg --rapid";
 
                 "d" = "tab-close";
                 "D" = "undo";
@@ -134,8 +134,8 @@ in {
                 ":" = "cmd-set-text :";
 
                 "<Escape>" = "clear-keychain ;; search";
-            } // (makeCommandSet "a" markSet (k: "set-mark ${k}"))
-              // (makeCommandSet "A" markSet (k: "jump-mark ${k}"));
+            } // (makeCommandSet "A" markSet (k: "set-mark ${k}"))
+              // (makeCommandSet "a" markSet (k: "jump-mark ${k}"));
             # a sets a mark, A jumps to a mark
         };
         # TODO : Complete personal binds and disable base
