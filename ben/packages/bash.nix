@@ -14,7 +14,6 @@
         ls = "ls --color=auto";
         l = "ls -alh";
         grep = "grep --color=auto";
-        glow = "glow -n";
         zpdf = "zathura --fork";
         icat = "img2sixel";
         nsh = "nix-shell -p";
