@@ -7,7 +7,6 @@
         playerctl
 
         # --[ Terminal Utilities ]--
-        glow
         libsixel
         slides
         bc
@@ -44,7 +43,14 @@
 
     # --[ Programs ]--
     programs = {
-        zathura.enable = true;
+        zathura = {
+            enable = true;
+            options = {
+                "selection-clipboard" = "clipboard";
+                "selection-notification" = false;
+            };
+        };
+
         freetube.enable = true;
 
         direnv = {
