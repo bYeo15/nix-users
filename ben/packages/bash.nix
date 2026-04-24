@@ -8,7 +8,7 @@
         uu = "cd ../..";
         uuu = "cd ../../..";
         uuuu = "cd ../../../..";
-        q = "exit";
+        ":q" = "exit";
         # Default args
         bc = "bc -ql";
         ls = "ls --color=auto";
@@ -47,22 +47,23 @@
             PROMPT_COMMAND=''${PROMPT_COMMAND:+''${PROMPT_COMMAND%;}; }osc7_cwd
             nrun() { PROG="''$1"; shift; nix run nixpkgs#"''${PROG}" -- "''$@"; }
             t() {
-                if [[ -z "''$1" ]]; then
-                    DIR="''$PWD"
+                if [[ $# -eq 0 ]]; then
+                    (foot --working-directory="$PWD" --log-level=none & disown -h)
                 else
-                    DIR="''$1"
+                    while [[ $# -gt 0 ]]; do
+                        (foot --working-directory="$1" --log-level=none & disown -h)
+                        shift
+                    done
                 fi
-
-                (foot --working-directory="''$DIR" --log-level=none & disown -h)
             }
         '';
 
         historyIgnore = [
             "ls" "l"
             "rm" "touch"
-            "cd" "u" "uu" "uuu"
+            "cd" "u" "uu" "uuu" "uuuu"
             "t"
-            "exit"
+            "exit" ":q"
             "clear" "c"
         ];
     };
