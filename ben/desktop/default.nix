@@ -10,5 +10,6 @@
        ./rofi.nix
        ./sway.nix
        ./theme.nix
+       ./xdg.nix
     ];
 }
