@@ -8,7 +8,6 @@
 
         # --[ Terminal Utilities ]--
         libsixel
-        slides
         bc
 
         # --[ LSP ]--
