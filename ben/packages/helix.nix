@@ -18,7 +18,7 @@
                 auto-format = false;
                 bufferline = "multiple";
                 trim-trailing-whitespace = true;
-                popup-border = "all";
+                popup-border = "none";
                 clipboard-provider = "wayland";
 
                 statusline = {
@@ -125,6 +125,12 @@
                         C = ":buffer-close";
                         r = [ ":buffer-close" "file_explorer_in_current_directory" ];
                         space = "file_explorer_in_current_directory";
+                    };
+
+                    # space : misc utils, typically integrations
+                    space = {
+                        # space -> w : word count selection
+                        w = ":sh wc -w <<< \"%{selection}\"";
                     };
                 };
 
