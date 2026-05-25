@@ -145,9 +145,9 @@ let
         "Tab" = "exec ${menu} -show window";
 
         h = "focus left";
-        "Shift+h" = "workspace next";
+        "Shift+h" = "workspace prev";
         l = "focus right";
-        "Shift+l" = "workspace prev";
+        "Shift+l" = "workspace next";
         k = "focus up";
         "Shift+k" = "focus parent";
         j = "focus down";
