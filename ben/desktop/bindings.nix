@@ -1,12 +1,12 @@
 { config, lib, pkgs, ... }:
 
 let
-    # ---=[ Commands ]=---
-    term = "${pkgs.foot}/bin/foot";
-    cap = "'grim -g \"''$(slurp -d)\" - | wl-copy -t image/png'";
+    term = lib.getExe pkgs.foot;
+    menu = lib.getExe pkgs.rofi;
+    modifier = "Mod4";
+    cap = "'grim -g \"$(slurp -d)\" - | wl-copy -t image/png'";
     copy-history = "cliphist list | rofi -dmenu -p \"Select Clipboard Item\" -no-tokenize | cliphist decode | wl-copy";
-    copy-clear = "cliphist wipe";
-    # ---=[ Workspaces ]=---
+
     ws1 = "1";
     ws2 = "2";
     ws3 = "3";
@@ -17,112 +17,197 @@ let
     ws8 = "8";
     ws9 = "9";
     wsHome = "0:⌂";
-in {
-    wayland.windowManager.sway.config = rec {
-        modifier = "Mod4";
-        terminal = term;
-        menu = "${pkgs.rofi}/bin/rofi";
 
+    toplevelMode = "+";
+
+    makeChain = name: binds: { name = "${name}"; chain = true; } // binds;
+    makeTransition = name: binds: next: { inherit name; inherit next; } // binds;
+
+    /*
+        bindSet -> sway Home-Manager format bindings
+        a bindSet looks like:
+
+        {
+            commonEscape [str]:
+                the key that returns to the toplevel mode
+
+            <key> -> command [str] | mode [attrs]:
+                toplevel binding (active in the initial mode)
+                either executes a command (from a string) or moves to the
+                given mode, which should be structured like;
+                    {
+                        name [str]:
+                            the name of the mode
+
+                        chain [bool] optional:
+                            if present and true, don't leave this mode after executing a command
+
+                        next [str] optional:
+                            mutually exclusive with chain (one must be set)
+                            if present, switch to the mode w/ this name after executing a command
+
+                        <key> -> command [str] | mode [attrs]:
+                            as above, recursive
+                    }
+        }
+    */
+    makeBinds = bindSet: let
+        bindSetNoEscape = lib.removeAttrs bindSet [ "commonEscape" ];
+        makeMode = mode: let
+            # All keybinds
+            modeBinds = lib.removeAttrs mode [ "name" "chain" "next" ];
+            # Keybinds that lead to other modes
+            modeTransitions = lib.filterAttrs (n: v: lib.isAttrs v) modeBinds;
+            # Keybinds within the given mode
+            modeActions = lib.filterAttrs (n: v: lib.isString v) modeBinds;
+
+            mkAction = if mode ? next
+                then
+                    # next - transition to some other mode
+                    (command: "${command}; mode ${mode.next}")
+                else
+                    # chain - don't exit
+                    (command: command);
+        in assert (lib.assertMsg
+            (
+                (mode ? "chain" && mode.chain && (! mode ? "next")) ||
+                (!(mode ? "chain" && mode.chain) && mode ? "next")
+            )
+            "Mode '${mode.name}' must set exactly one of chain or next"
+        ); {
+            # build the current mode
+            "${mode.name}" = (lib.mapAttrs (n: v: mkAction v) modeActions) //
+                             (lib.mapAttrs (n: v: "mode \"${v.name}\"") modeTransitions) //
+                             {
+                                "${bindSet.commonEscape}" = "mode \"default\"";
+                             };
+        } // (
+            lib.mergeAttrsList (lib.map makeMode (lib.attrValues modeTransitions))
+        );
+    in {
         keybindings = {
-            # ---=[ Applications and Launcher ]=---
-            "${modifier}+Return" = "exec ${terminal}";
-            "${modifier}+d" = "exec ${menu} -show drun";
-            "${modifier}+s" = "exec quicksearch";
-            "${modifier}+Tab" = "exec ${menu} -show window";
+            # switch to reserved toplevel mode
+            "${modifier}" = "mode \"${toplevelMode}\"";
+        };
 
-            # ---=[ Navigation ]=---
-            "${modifier}+h" = "focus left";
-            "${modifier}+l" = "focus right";
-            "${modifier}+k" = "focus up";
-            "${modifier}+j" = "focus down";
-            "${modifier}+minus" = "scratchpad show";
-            "${modifier}+Shift+h" = "workspace prev";
-            "${modifier}+Shift+l" = "workspace next";
-            "${modifier}+1" = "workspace ${ws1}";
-            "${modifier}+2" = "workspace ${ws2}";
-            "${modifier}+3" = "workspace ${ws3}";
-            "${modifier}+4" = "workspace ${ws4}";
-            "${modifier}+5" = "workspace ${ws5}";
-            "${modifier}+6" = "workspace ${ws6}";
-            "${modifier}+7" = "workspace ${ws7}";
-            "${modifier}+8" = "workspace ${ws8}";
-            "${modifier}+9" = "workspace ${ws9}";
-            "${modifier}+0" = "workspace ${wsHome}";
+        modes = makeMode ({ name = "${toplevelMode}"; next = "default"; } // bindSetNoEscape);
+    };
 
-            # ---=[ Container Management ]=---
-            "${modifier}+Shift+1" = "move container to workspace ${ws1}";
-            "${modifier}+Shift+2" = "move container to workspace ${ws2}";
-            "${modifier}+Shift+3" = "move container to workspace ${ws3}";
-            "${modifier}+Shift+4" = "move container to workspace ${ws4}";
-            "${modifier}+Shift+5" = "move container to workspace ${ws5}";
-            "${modifier}+Shift+6" = "move container to workspace ${ws6}";
-            "${modifier}+Shift+7" = "move container to workspace ${ws7}";
-            "${modifier}+Shift+8" = "move container to workspace ${ws8}";
-            "${modifier}+Shift+9" = "move container to workspace ${ws9}";
-            "${modifier}+Shift+0" = "move container to workspace ${wsHome}";
-            "${modifier}+Shift+space" = "floating toggle";
-            "${modifier}+space" = "focus mode_toggle";
-            "${modifier}+f" = "fullscreen";
-            "${modifier}+w" = "layout tabbed";
-            "${modifier}+e" = "layout toggle split";
-            "${modifier}+Shift+minus" = "move scratchpad";
-            "${modifier}+Shift+q" = "kill";
+    binds = let
+        moveBinds = {
+            h = "move left 15 px";
+            "Shift+h" = "move left 30 px";
+            l = "move right 15 px";
+            "Shift+l" = "move right 30 px";
+            k = "move up 15 px";
+            "Shift+k" = "move up 30 px";
+            j = "move down 15 px";
+            "Shift+j" = "move down 30 px";
 
-            # ---=[ Modes ]=---
-            "${modifier}+m" = "mode \"move\"";
-            "${modifier}+r" = "mode \"resize\"";
+            "1" = "move container to workspace ${ws1}";
+            "2" = "move container to workspace ${ws2}";
+            "3" = "move container to workspace ${ws3}";
+            "4" = "move container to workspace ${ws4}";
+            "5" = "move container to workspace ${ws5}";
+            "6" = "move container to workspace ${ws6}";
+            "7" = "move container to workspace ${ws7}";
+            "8" = "move container to workspace ${ws8}";
+            "9" = "move container to workspace ${ws9}";
+            "0" = "move container to workspace ${wsHome}";
 
-            # ---=[ Audio/Media ]=---
+            "minus" = "move scratchpad";
+
+            "Space" = "floating toggle";
+        };
+
+        resizeBinds = {
+            c = "resize set width 50 ppt";
+            "Shift+c" = "resize set width 33 ppt";
+            v = "resize set height 50 ppt";
+            "Shift+v" = "resize set width 33 ppt";
+
+            h = "resize shrink width 15 px";
+            "Shift+h" = "resize shrink width 30 px";
+            k = "resize grow height 15 px";
+            "Shift+k" = "resize grow height 30 px";
+            j = "resize shrink width 15 px";
+            "Shift+j" = "resize shrink width 30 px";
+            l = "resize grow width 15 px";
+            "Shift+l" = "resize grow width 30 px";
+        };
+    in {
+        commonEscape = "Escape";
+
+        "Return" = "exec ${term}";
+        d = "exec ${menu} -show drun";
+        s = "exec quicksearch";
+        a = "exec ${copy-history}";
+        "Tab" = "exec ${menu} -show window";
+
+        h = "focus left";
+        "Shift+h" = "workspace next";
+        l = "focus right";
+        "Shift+l" = "workspace prev";
+        k = "focus up";
+        "Shift+k" = "focus parent";
+        j = "focus down";
+        "Shift+j" = "focus child";
+
+        "Space" = "focus mode_toggle";
+
+        "1" = "workspace ${ws1}";
+        "2" = "workspace ${ws2}";
+        "3" = "workspace ${ws3}";
+        "4" = "workspace ${ws4}";
+        "5" = "workspace ${ws5}";
+        "6" = "workspace ${ws6}";
+        "7" = "workspace ${ws7}";
+        "8" = "workspace ${ws8}";
+        "9" = "workspace ${ws9}";
+        "0" = "workspace ${wsHome}";
+
+        "minus" = "scratchpad show";
+
+        f = "fullscreen toggle";
+        e = "layout toggle split";
+        w = "layout tabbed";
+        v = "split vertical";
+        c = "split horizontal";
+        x = "split none";
+
+        z = "exec ${lib.getExe pkgs.swaylock}";
+
+        "Shift+q" = "kill";
+
+        "slash" = "exec playerctl play-pause";
+        "period" = "exec playerctl next";
+        "comma" = "exec playerctl previous";
+
+        m = makeTransition "m" moveBinds "default";
+        "Shift+m" = makeChain "M" moveBinds;
+
+        r = makeTransition "r" resizeBinds "default";
+        "Shift+r" = makeChain "R" resizeBinds;
+    };
+
+    bindsRealised = makeBinds binds;
+in {
+    wayland.windowManager.sway.config = {
+        terminal = term;
+
+        # default-level binds include function keys
+        keybindings = {
             "--locked XF86AudioMute" = "exec wpctl set-mute @DEFAULT_SINK@ toggle";
             "--locked XF86AudioLowerVolume" = "exec wpctl set-volume @DEFAULT_SINK@ 5%-";
             "--locked XF86AudioRaiseVolume" = "exec wpctl set-volume @DEFAULT_SINK@ 5%+";
             "--locked XF86AudioMicMute" = "exec wpctl set-mute @DEFAULT_SOURCE@ toggle";
 
-            "${modifier}+slash" = "exec playerctl play-pause";
-            "${modifier}+period" = "exec playerctl next";
-            "${modifier}+comma" = "exec playerctl previous";
-
-            # ---=[ Misc ]=---
             "--locked XF86MonBrightnessDown" = "exec brightnessctl s 5%-";
             "--locked XF86MonBrightnessUp" = "exec brightnessctl s +5%";
 
             "Print" = "exec ${cap}";
-            "${modifier}+Shift+v" = "exec ${copy-history}";
-            "${modifier}+Shift+b" = "exec ${copy-clear}";
-            "${modifier}+z" = "exec ${pkgs.swaylock}/bin/swaylock";
-            "${modifier}+Shift+c" = "reload";
-        };
+        } // bindsRealised.keybindings;
 
-        modes = {
-            move = {
-                Left = "move left";
-                Right = "move right";
-                Up = "move up";
-                Down = "move down";
-                "${modifier}+h" = "move left";
-                "${modifier}+l" = "move right";
-                "${modifier}+k" = "move up";
-                "${modifier}+j" = "move down";
-                a = "focus parent";
-                s = "focus child";
-                v = "split v";
-                h = "split h";
-                n = "split n";
-                Return = "mode \"default\"";
-                Escape = "mode \"default\"";
-            };
-            resize = {
-                Left = "resize shrink width 10px";
-                Right = "resize grow width 10px";
-                Up = "resize grow height 10px";
-                Down = "resize shrink height 10px";
-                "${modifier}+h" = "resize shrink width 10px";
-                "${modifier}+l" = "resize grow width 10px";
-                "${modifier}+k" = "resize grow height 10px";
-                "${modifier}+j" = "resize shrink height 10px";
-                Return = "mode \"default\"";
-                Escape = "mode \"default\"";
-            };
-        };
+        inherit (bindsRealised) modes;
     };
 }
