@@ -1,13 +1,19 @@
 { config, lib, pkgs, ... }:
 
 {
-    home.shellAliases = {
+    home.shellAliases = let
+        clrls = "clear; echo \"\${PS1@P}\"; ls";
+    in {
         # Short binds
-        c = "clear; echo \"\${PS1@P}\"; ls";
+        c = clrls;
         u = "cd ..";
+        uc = "cd ..; ${clrls}";
         uu = "cd ../..";
+        uuc = "cd ../..; ${clrls}";
         uuu = "cd ../../..";
+        uuuc = "cd ../../..; ${clrls}";
         uuuu = "cd ../../../..";
+        uuuuc = "cd ../../../..; ${clrls}";
         ":q" = "exit";
         # Default args
         bc = "bc -ql";
@@ -72,6 +78,7 @@
             "t"
             "exit" ":q"
             "clear" "c"
+            "uc" "uuc" "uuuc" "uuuuc"
         ];
     };
 }
