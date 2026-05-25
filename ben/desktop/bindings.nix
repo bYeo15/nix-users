@@ -3,7 +3,7 @@
 let
     term = lib.getExe pkgs.foot;
     menu = lib.getExe pkgs.rofi;
-    modifier = "Mod4";
+    modifier = "Super_L";
     cap = "'grim -g \"$(slurp -d)\" - | wl-copy -t image/png'";
     copy-history = "cliphist list | rofi -dmenu -p \"Select Clipboard Item\" -no-tokenize | cliphist decode | wl-copy";
 
@@ -95,14 +95,14 @@ let
 
     binds = let
         moveBinds = {
-            h = "move left 15 px";
-            "Shift+h" = "move left 30 px";
-            l = "move right 15 px";
-            "Shift+l" = "move right 30 px";
-            k = "move up 15 px";
-            "Shift+k" = "move up 30 px";
-            j = "move down 15 px";
-            "Shift+j" = "move down 30 px";
+            h = "move left 30 px";
+            "Shift+h" = "move left 60 px";
+            l = "move right 30 px";
+            "Shift+l" = "move right 60 px";
+            k = "move up 30 px";
+            "Shift+k" = "move up 60 px";
+            j = "move down 30 px";
+            "Shift+j" = "move down 60 px";
 
             "1" = "move container to workspace ${ws1}";
             "2" = "move container to workspace ${ws2}";
@@ -126,14 +126,14 @@ let
             v = "resize set height 50 ppt";
             "Shift+v" = "resize set width 33 ppt";
 
-            h = "resize shrink width 15 px";
-            "Shift+h" = "resize shrink width 30 px";
-            k = "resize grow height 15 px";
-            "Shift+k" = "resize grow height 30 px";
-            j = "resize shrink width 15 px";
-            "Shift+j" = "resize shrink width 30 px";
-            l = "resize grow width 15 px";
-            "Shift+l" = "resize grow width 30 px";
+            h = "resize shrink width 30 px";
+            "Shift+h" = "resize shrink width 60 px";
+            k = "resize grow height 30 px";
+            "Shift+k" = "resize grow height 60 px";
+            j = "resize shrink width 30 px";
+            "Shift+j" = "resize shrink width 60 px";
+            l = "resize grow width 30 px";
+            "Shift+l" = "resize grow width 60 px";
         };
     in {
         commonEscape = "Escape";
