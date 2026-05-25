@@ -67,6 +67,7 @@
                 };
             };
 
+            # TODO : Add "generic binds" that are mapped into all modes
             keys = {
                 normal = {
                     left = "no_op";
@@ -127,10 +128,16 @@
                         space = "file_explorer_in_current_directory";
                     };
 
+                    # TODO : function that maps common binds into all modes
                     # space : misc utils, typically integrations
                     space = {
                         # space -> w : word count selection
                         w = ":sh wc -w <<< \"%{selection}\"";
+                        # git : git utils
+                        g = {
+                            # b : git blame for current line
+                            b = ":sh git blame -L \"%{cursor_line}\",\"%{cursor_line}\" \"%{buffer_name}\" --porcelain";
+                        };
                     };
                 };
 
