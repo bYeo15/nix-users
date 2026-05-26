@@ -130,8 +130,8 @@ let
             "Shift+h" = "resize shrink width 60 px";
             k = "resize grow height 30 px";
             "Shift+k" = "resize grow height 60 px";
-            j = "resize shrink width 30 px";
-            "Shift+j" = "resize shrink width 60 px";
+            j = "resize shrink height 30 px";
+            "Shift+j" = "resize shrink height 60 px";
             l = "resize grow width 30 px";
             "Shift+l" = "resize grow width 60 px";
         };
