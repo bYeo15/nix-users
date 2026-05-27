@@ -19,6 +19,7 @@ let
     wsHome = "0:⌂";
 
     toplevelMode = "+";
+    toplevelChainMode = "-";
 
     makeChain = name: binds: { name = "${name}"; chain = true; } // binds;
     makeTransition = name: binds: next: { inherit name; inherit next; } // binds;
@@ -63,10 +64,15 @@ let
 
             mkAction = if mode ? next
                 then
-                    # next - transition to some other mode
-                    (command: "${command}; mode ${mode.next}")
+                    # next - transition to some other mode after executing,
+                    # unless the command explicitly sets a mode
+                    (
+                        command: if (isNull (lib.match ".*mode \".*\".*" command))
+                            then "${command}; mode \"${mode.next}\""
+                            else command
+                    )
                 else
-                    # chain - don't exit
+                    # chain - don't exit the current mode
                     (command: command);
         in assert (lib.assertMsg
             (
@@ -88,9 +94,11 @@ let
         keybindings = {
             # switch to reserved toplevel mode
             "${modifier}" = "mode \"${toplevelMode}\"";
+            "${modifier}+Shift" = "mode \"${toplevelChainMode}\"";
         };
 
-        modes = makeMode ({ name = "${toplevelMode}"; next = "default"; } // bindSetNoEscape);
+        modes = (makeMode ({ name = "${toplevelMode}"; next = "default"; } // bindSetNoEscape)) //
+                (makeMode ({ name = "${toplevelChainMode}"; chain = true; } // bindSetNoEscape));
     };
 
     binds = let
@@ -138,11 +146,11 @@ let
     in {
         commonEscape = "Escape";
 
-        "Return" = "exec ${term}";
-        d = "exec ${menu} -show drun";
-        s = "exec quicksearch";
-        a = "exec ${copy-history}";
-        "Tab" = "exec ${menu} -show window";
+        "Return" = "exec ${term}; mode \"default\"";
+        d = "exec ${menu} -show drun; mode \"default\"";
+        s = "exec quicksearch; mode \"default\"";
+        a = "exec ${copy-history}; mode \"default\"";
+        "Tab" = "exec ${menu} -show window; mode \"default\"";
 
         h = "focus left";
         "Shift+h" = "workspace prev";
@@ -175,7 +183,7 @@ let
         c = "split horizontal";
         x = "split none";
 
-        z = "exec ${lib.getExe pkgs.swaylock}";
+        z = "exec ${lib.getExe pkgs.swaylock}; mode \"default\"";
 
         "Shift+q" = "kill";
 
