@@ -72,7 +72,8 @@ let
                             else command
                     )
                 else
-                    # chain - don't exit the current mode
+                    # chain - don't exit the current mode (unless the command
+                    # explicitly does so)
                     (command: command);
         in assert (lib.assertMsg
             (
@@ -126,6 +127,9 @@ let
             "minus" = "move scratchpad";
 
             "Space" = "floating toggle";
+
+            "${modifier}" = "mode \"${toplevelMode}\"";
+            "${modifier}+Shift" = "mode \"${toplevelChainMode}\"";
         };
 
         resizeBinds = {
@@ -142,6 +146,9 @@ let
             "Shift+j" = "resize shrink height 60 px";
             l = "resize grow width 30 px";
             "Shift+l" = "resize grow width 60 px";
+
+            "${modifier}" = "mode \"${toplevelMode}\"";
+            "${modifier}+Shift" = "mode \"${toplevelChainMode}\"";
         };
     in {
         commonEscape = "Escape";
