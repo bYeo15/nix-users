@@ -21,6 +21,13 @@ let
     toplevelMode = "+";
     toplevelChainMode = "-";
 
+    modeShowHideBar = if (
+        config.renix.activeTheme.integrations ? "sway" &&
+        config.renix.activeTheme.integrations.sway.enable &&
+        config.renix.activeTheme.integrations.sway ? "showHideBar" &&
+        config.renix.activeTheme.integrations.sway.showHideBar
+    ) then (mode: "; bar mode ${mode}") else (mode: "");
+
     makeChain = name: binds: { name = "${name}"; chain = true; } // binds;
     makeTransition = name: binds: next: { inherit name; inherit next; } // binds;
 
@@ -68,7 +75,9 @@ let
                     # unless the command explicitly sets a mode
                     (
                         command: if (isNull (lib.match ".*mode \".*\".*" command))
-                            then "${command}; mode \"${mode.next}\""
+                            then (if mode != "default"
+                                    then "${command}; mode \"${mode.next}\""
+                                    else "${command}; mode \"${mode.next}\"${modeShowHideBar "invisible"}")
                             else command
                     )
                 else
@@ -86,7 +95,7 @@ let
             "${mode.name}" = (lib.mapAttrs (n: v: mkAction v) modeActions) //
                              (lib.mapAttrs (n: v: "mode \"${v.name}\"") modeTransitions) //
                              {
-                                "${bindSet.commonEscape}" = "mode \"default\"";
+                                "${bindSet.commonEscape}" = "mode \"default\"${modeShowHideBar "invisible"}";
                              };
         } // (
             lib.mergeAttrsList (lib.map makeMode (lib.attrValues modeTransitions))
@@ -94,8 +103,8 @@ let
     in {
         keybindings = {
             # switch to reserved toplevel mode
-            "${modifier}" = "mode \"${toplevelMode}\"";
-            "${modifier}+Shift" = "mode \"${toplevelChainMode}\"";
+            "${modifier}" = "mode \"${toplevelMode}\"${modeShowHideBar "dock"}";
+            "${modifier}+Shift" = "mode \"${toplevelChainMode}\"${modeShowHideBar "dock"}";
         };
 
         modes = (makeMode ({ name = "${toplevelMode}"; next = "default"; } // bindSetNoEscape)) //
