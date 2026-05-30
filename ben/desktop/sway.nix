@@ -69,13 +69,6 @@ in {
                         };
                     }
                     {
-                        command = "border normal 0";
-
-                        criteria = {
-                            app_id = "foot";
-                        };
-                    }
-                    {
                         command = "move to workspace ${wsHome}; opacity ${term-opacity}";
 
                         criteria = {
@@ -87,13 +80,6 @@ in {
 
                         criteria = {
                             app_id = "foot";
-                        };
-                    }
-                    {
-                        command = "title_format \"%title (%app_id%class)\"";
-
-                        criteria = {
-                            all = true;
                         };
                     }
                 ];
