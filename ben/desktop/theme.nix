@@ -3,6 +3,6 @@
 {
     config.renix = {
         enable = true;
-        activeTheme = config.renix.themes."ink";
+        activeTheme = config.renix.themes."singularity";
     };
 }
