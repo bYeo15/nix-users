@@ -97,8 +97,6 @@ in {
                         '';
                 }
             ];
-
-            bars = [ ];
         };
 
         extraConfig = ''
