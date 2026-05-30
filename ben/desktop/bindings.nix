@@ -73,16 +73,34 @@ let
                     # next - transition to some other mode after executing,
                     # unless the command explicitly sets a mode
                     (
-                        command: if (isNull (lib.match ".*mode \".*\".*" command))
-                            then (if mode != "default"
+                        command: let
+                            commandModeMatch = lib.match "(.*)mode \"(.*)\"(.*)" command;
+                            commandPrefix = lib.elemAt commandModeMatch 0;
+                            commandMode = lib.elemAt commandModeMatch 1;
+                            commandSuffix = lib.elemAt commandModeMatch 2;
+                        in if (isNull commandModeMatch)
+                            # command doesn't set a mode -> move to next and possibly toggle bar
+                            then (if mode.next != "default"
                                     then "${command}; mode \"${mode.next}\""
                                     else "${command}; mode \"${mode.next}\"${modeShowHideBar "invisible"}")
-                            else command
+                            # command does set a mode -> leave as is, possibly toggle bar if the mode is default
+                            else (if commandMode != "default"
+                                    then command
+                                    else "${command}${modeShowHideBar "invisible"}")
                     )
                 else
                     # chain - don't exit the current mode (unless the command
                     # explicitly does so)
-                    (command: command);
+                    (
+                        command: let
+                            commandModeMatch = lib.match "(.*)mode \"(.*)\"(.*)" command;
+                            commandPrefix = lib.elemAt commandModeMatch 0;
+                            commandMode = lib.elemAt commandModeMatch 1;
+                            commandSuffix = lib.elemAt commandModeMatch 2;
+                        in if (isNull commandModeMatch || commandMode != "default")
+                            then command
+                            else "${command}${modeShowHideBar "invisible"}"
+                    );
         in assert (lib.assertMsg
             (
                 (mode ? "chain" && mode.chain && (! mode ? "next")) ||
