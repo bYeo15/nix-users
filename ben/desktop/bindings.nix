@@ -1,6 +1,7 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, extlib, ... }:
 
 let
+    inherit (extlib) withDefault;
     term = lib.getExe pkgs.foot;
     menu = lib.getExe pkgs.rofi;
     modifier = "Super_L";
@@ -22,10 +23,8 @@ let
     toplevelChainMode = "-";
 
     modeShowHideBar = if (
-        config.renix.activeTheme.integrations ? "sway" &&
-        config.renix.activeTheme.integrations.sway.enable &&
-        config.renix.activeTheme.integrations.sway ? "showHideBar" &&
-        config.renix.activeTheme.integrations.sway.showHideBar
+        withDefault config.renix.activeTheme [ "integrations" "sway" "enable" ] false &&
+        withDefault config.renix.activeTheme [ "integrations" "sway" "showHideBar" ] false
     ) then (mode: "; bar mode ${mode}") else (mode: "");
 
     makeChain = name: binds: { name = "${name}"; chain = true; } // binds;
