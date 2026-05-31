@@ -120,8 +120,8 @@ let
     in {
         keybindings = {
             # switch to reserved toplevel mode
-            "${modifier}" = "mode \"${toplevelMode}\"${modeShowHideBar "dock"}";
-            "${modifier}+Shift" = "mode \"${toplevelChainMode}\"${modeShowHideBar "dock"}";
+            "${modifier}" = "mode \"${toplevelMode}\"${modeShowHideBar "overlay"}";
+            "${modifier}+Shift" = "mode \"${toplevelChainMode}\"${modeShowHideBar "overlay"}";
         };
 
         modes = (makeMode ({ name = "${toplevelMode}"; next = "default"; } // bindSetNoEscape)) //
